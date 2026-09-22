@@ -16,6 +16,8 @@
 --     and treat the path as a revision.
 --   * `<CR>` is rebound on purpose: in git_log it defaults to `git_checkout`,
 --     which puts you in detached HEAD just for inspecting a commit.
+--   * Inside Diffview, bare `q` on the file panel / file history panel closes the
+--     view (LazyVim's `close_with_q` convention); `:DiffviewClose` always works.
 
 local function open_diffview(picker, item)
   if not item or not item.commit then
@@ -56,6 +58,15 @@ return {
     keys = {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diffview Working Tree" },
       { "<leader>gD", "<cmd>DiffviewFileHistory<cr>", desc = "Diffview File History" },
+    },
+    opts = {
+      -- LazyVim's `close_with_q` convention (lua/lazyvim/config/autocmds.lua) applied to
+      -- Diffview's own panel filetypes: bare `q` closes the view, buffer-local.
+      -- User keymaps are appended to the defaults, nothing is replaced.
+      keymaps = {
+        file_panel = { { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Quit Diffview" } } },
+        file_history_panel = { { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Quit Diffview" } } },
+      },
     },
   },
 

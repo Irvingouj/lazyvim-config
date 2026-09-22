@@ -61,7 +61,8 @@ LazyVim extras are imported in `lua/config/lazy.lua` (that is why `lazyvim.json`
 | `<leader>gg` | lazygit |
 
 Inside Diffview: `<Tab>` / `<S-Tab>` next / previous file, `]c` / `[c` next / previous hunk,
-`:DiffviewClose` to leave. `<CR>` is remapped in `git_log` on purpose — its default action is
+`q` on the file panel to leave (or `:DiffviewClose` from anywhere — Diffview lives in its own
+tabpage, so `:tabclose` works too). `<CR>` is remapped in `git_log` on purpose — its default action is
 `git_checkout`, which drops you into detached HEAD just for inspecting a commit. The commit diff is
 opened as `<sha>^!` (`parent..commit`); if you want the old checkout behaviour back, add
 `["<C-X>"] = "git_checkout"` to the key tables in `lua/plugins/diffview.lua`.
@@ -69,6 +70,9 @@ opened as `<sha>^!` (`parent..commit`); if you want the old checkout behaviour b
 ## Plugins / tweaks worth knowing
 
 - **`lua/plugins/diffview.lua`** — `sindrets/diffview.nvim` + the Snacks action described above.
+  Bare `q` closes the view from the file panel / file history panel, following LazyVim's
+  `close_with_q` convention (upstream's filetype list does not include Diffview's panels, so it is
+  added here through Diffview's own `keymaps` option).
 - **`lua/plugins/minuet.lua`** — inline AI completion via `minuet-ai.nvim`, provider DeepSeek.
   The API key is never in the repo: it is read from `$DEEPSEEK_API_KEY`, falling back to sourcing
   `~/rc.deepseek.rc`. Autocomplete is bound to `<A-y>`, does not run automatically.
