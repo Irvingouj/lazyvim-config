@@ -85,7 +85,6 @@ opened as `<sha>^!` (`parent..commit`); if you want the old checkout behaviour b
   `<leader>xb` build, `<leader>xr` build & run, `<leader>xt` test.
 - **`lua/plugins/colorscheme.lua`** — solarized, following the macOS light/dark appearance
   (`auto-dark-mode.nvim`).
-- `lua/plugins/example.lua` — untouched LazyVim starter example, returns `{}`; safe to delete.
 
 ## Keymap added on top of LazyVim
 
