@@ -1,4 +1,7 @@
 local function macos_background()
+  if vim.fn.has("mac") == 0 then
+    return "light"
+  end
   local out = vim.fn.system({ "defaults", "read", "-g", "AppleInterfaceStyle" })
   if vim.v.shell_error == 0 and out:match("Dark") then
     return "dark"

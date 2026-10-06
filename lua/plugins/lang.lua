@@ -1,15 +1,33 @@
 -- rustaceanvim v9+ requires Neovim 0.12. On 0.11.x we pin the last v8 release;
--- after `brew upgrade neovim` (>= 0.12) this pin clears itself automatically.
+-- after upgrading Neovim (>= 0.12) this pin clears itself automatically.
 local rustaceanvim_version = "^8"
 if vim.fn.has("nvim-0.12") == 1 then
   rustaceanvim_version = nil
+end
+
+local function java21_executable()
+  if vim.fn.has("mac") == 1 then
+    return "/opt/homebrew/opt/openjdk@21/bin/java"
+  end
+  if vim.env.JAVA_HOME and vim.env.JAVA_HOME ~= "" then
+    return vim.fs.joinpath(vim.env.JAVA_HOME, "bin", vim.fn.has("win32") == 1 and "java.exe" or "java")
+  end
+  return vim.fn.exepath("java")
+end
+
+local function liblldb_path()
+  local lldb = vim.fn.stdpath("data") .. "/mason/opt/lldb"
+  if vim.fn.has("win32") == 1 then
+    return lldb .. "/bin/liblldb.dll"
+  end
+  return lldb .. "/lib/liblldb" .. (vim.fn.has("mac") == 1 and ".dylib" or ".so")
 end
 
 return {
   {
     "mfussenegger/nvim-jdtls",
     opts = function(_, opts)
-      local java21 = "/opt/homebrew/opt/openjdk@21/bin/java"
+      local java21 = java21_executable()
       local lombok_jar = vim.fn.stdpath("data") .. "/mason/share/jdtls/lombok.jar"
       if not (vim.uv or vim.loop).fs_stat(java21) or not (vim.uv or vim.loop).fs_stat(lombok_jar) then
         return
@@ -31,6 +49,13 @@ return {
   {
     "mrcjkb/rustaceanvim",
     version = rustaceanvim_version,
+    -- replaces LazyVim's config, which shells out to `uname` (missing on Windows)
+    config = function(_, opts)
+      opts.dap = {
+        adapter = require("rustaceanvim.config").get_codelldb_adapter(vim.fn.exepath("codelldb"), liblldb_path()),
+      }
+      vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+    end,
     opts = function(_, opts)
       local ra = opts.server.default_settings["rust-analyzer"]
 
@@ -79,18 +104,45 @@ return {
     },
   },
 
+  -- C# -----------------------------------------------------------------
+  -- Roslyn (the server VS Code uses) replaces the dotnet extra's OmniSharp;
+  -- the extra still brings csharpier, netcoredbg and the F# bits.
+  {
+    "seblyng/roslyn.nvim",
+    cond = vim.fn.has("nvim-0.12") == 1,
+    ft = { "cs", "razor" },
+    opts = {},
+  },
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        omnisharp = { enabled = false },
+      },
+    },
+  },
+
   {
     "mason-org/mason.nvim",
     opts = {
+      -- `roslyn` comes from Crashdummyy's registry, which tracks the VS Code version
+      registries = {
+        "github:mason-org/mason-registry",
+        "github:Crashdummyy/mason-registry",
+      },
+      -- The only Mason list in this config: lazy.nvim does not dedupe merged lists, and a
+      -- duplicate makes LazyVim install a package twice and abort. Extras' own tools are left out.
       ensure_installed = {
+        -- C#
+        "roslyn",
+        -- Rust
+        "rust-analyzer",
         -- JavaScript/TypeScript/React/Node
         "eslint-lsp",
         "prettierd",
         "typescript-language-server",
-        "js-debug-adapter",
-        -- Go
-        "gofumpt",
-        "goimports",
+        -- Vue
+        "vue-language-server",
         -- JSON/CSS/HTML
         "json-lsp",
         "css-lsp",

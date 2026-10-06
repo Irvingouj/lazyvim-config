@@ -14,7 +14,8 @@ vim.opt.writebackup = false
 vim.opt.autoread = true
 
 -- Add Mason's bin directory to PATH so LSP servers can be found
-vim.env.PATH = vim.env.PATH .. ":" .. vim.fn.stdpath("data") .. "/mason/bin"
+local path_sep = vim.fn.has("win32") == 1 and ";" or ":"
+vim.env.PATH = vim.env.PATH .. path_sep .. vim.fn.stdpath("data") .. "/mason/bin"
 
 -- blink.cmp v2 (its `main` branch) requires Neovim 0.12+.
 -- On 0.11.x we let LazyVim use the latest release (v1.x) instead;

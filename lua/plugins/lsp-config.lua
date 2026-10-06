@@ -1,10 +1,15 @@
 -- LSP Configuration for Swift, TypeScript, Vue, React, Node
 -- (Rust is handled by rustaceanvim -- see plugins/lang.lua)
+local is_mac = vim.fn.has("mac") == 1
+
 return {
   -- Consolidated LSP configuration for all languages
   {
     "neovim/nvim-lspconfig",
     init = function()
+      if not is_mac then
+        return
+      end
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "swift",
         callback = function(args)
@@ -44,8 +49,8 @@ return {
         -- Disable markdown LSP
         marksman = false,
         -- Rust is handled by rustaceanvim -- see plugins/lang.lua
-        -- Swift LSP
-        sourcekit = {
+        -- Swift LSP (Xcode only exists on macOS)
+        sourcekit = is_mac and {
           cmd = { "xcrun", "sourcekit-lsp" },
           filetypes = { "swift", "objective-c", "objective-cpp" },
           root_dir = function(fname)
@@ -60,7 +65,7 @@ return {
               ".git"
             )(fname)
           end,
-        },
+        } or false,
       },
     },
   },
@@ -114,34 +119,10 @@ return {
     },
   },
 
-  -- Mason: Install additional LSP servers and tools
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      ensure_installed = {
-        -- Rust
-        "rust-analyzer",
-        "codelldb",
-        -- TypeScript/JavaScript/Node
-        "typescript-language-server",
-        "eslint-lsp",
-        "prettierd",
-        "js-debug-adapter",
-        -- Vue
-        "vue-language-server",
-        -- General
-        "tailwindcss-language-server",
-        "css-lsp",
-        "html-lsp",
-        "json-lsp",
-        -- "markdown-oxide", -- Disabled
-      },
-    },
-  },
-
   -- Additional Swift development tools
   {
     "wojciech-kulik/xcodebuild.nvim",
+    cond = is_mac,
     dependencies = {
       "nvim-telescope/telescope.nvim",
       "MunifTanjim/nui.nvim",

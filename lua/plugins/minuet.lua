@@ -4,7 +4,7 @@ local function load_deepseek_env()
   end
 
   local rc = vim.fn.expand("~/rc.deepseek.rc")
-  if vim.fn.filereadable(rc) == 0 then
+  if vim.fn.filereadable(rc) == 0 or vim.fn.executable("zsh") == 0 then
     return
   end
 
