@@ -80,15 +80,17 @@ opened as `<sha>^!` (`parent..commit`); if you want the old checkout behaviour b
   `<leader>fp` to pick one, `]p` / `[p` to page, and the snacks explorer confirm action opens PDFs
   in the buffer instead of an external viewer.
 - **`lua/plugins/lang.lua`** — Java: jdtls with Lombok, pinned to Homebrew's `openjdk@21` (bails out
-  gracefully if either is missing). Rust: rustaceanvim, `clippy` on save, inline type/param/chaining
+  gracefully if either is missing), rooted at the outermost Maven project with a per-checkout
+  workspace name so git worktrees do not share/corrupt each other's jdtls index. Rust: rustaceanvim, `clippy` on save, inline type/param/chaining
   hints. rustaceanvim is pinned to `^8` on Neovim 0.11 because v9+ needs 0.12; the pin clears
   itself once Neovim is upgraded.
 - **`lua/plugins/lsp-config.lua`** — Swift/ObjC via `xcrun sourcekit-lsp` (started directly from
   Xcode, not Mason, with `*.xcodeproj`/`Package.swift`/`buildServer.json` root detection), marksman
   disabled, tailwind/css/html/json servers, plus `xcodebuild.nvim` for
   `<leader>xb` build, `<leader>xr` build & run, `<leader>xt` test.
-- **`lua/plugins/colorscheme.lua`** — solarized, following the macOS light/dark appearance
-  (`auto-dark-mode.nvim`).
+- **`lua/plugins/colorscheme.lua`** — solarized, following the macOS light/dark appearance via
+  `~/.config/alacritty/macos-appearance` (SkyLight live appearance; not the cached
+  `AppleInterfaceStyle` pref). Other platforms fall back to `auto-dark-mode.nvim`.
 
 ## Keymap added on top of LazyVim
 
