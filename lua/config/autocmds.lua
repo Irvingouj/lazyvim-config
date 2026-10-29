@@ -16,3 +16,16 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.wrap = false
   end,
 })
+
+-- zellij never tells nvim when you switch panes, so LazyVim's FocusGained reload never runs
+-- and files edited by an AI in another pane go stale. Poll instead.
+local checktime_timer = vim.uv.new_timer()
+checktime_timer:start(
+  1000,
+  1000,
+  vim.schedule_wrap(function()
+    if vim.fn.mode() ~= "c" and vim.fn.getcmdwintype() == "" then
+      vim.cmd("silent! checktime")
+    end
+  end)
+)
